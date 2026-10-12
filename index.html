@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>ガチャ見たよ帳</title>
+<meta name="description" content="友達どうしで見かけたガチャと発売予定を共有するメモ帳">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3E%3Cpath d='M15 2.5c7 0 12.5 5.4 12.5 12.3h-25C2.5 7.9 8 2.5 15 2.5z' fill='%23f2a98a'/%3E%3Cpath d='M2.5 15.2h25C27.5 22.2 22 27.5 15 27.5S2.5 22.2 2.5 15.2z' fill='%238cc9b4'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Yomogi&family=Zen+Maru+Gothic:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <svg width="54" height="54" viewBox="0 0 54 54" aria-hidden="true">
+      <path d="M27 4c12.5 0 23 9.8 23 22.6H4C4 13.8 14.5 4 27 4z" fill="var(--peach)" opacity=".85"/>
+      <path d="M4 27.4h46C50 40.6 39.6 50 27 50S4 40.6 4 27.4z" fill="var(--mint)" opacity=".75"/>
+      <path d="M5 27c7-1.2 37-1.5 44 .4" stroke="var(--ink)" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+      <path d="M14 15c3-4 7-5.5 10-5.8" stroke="var(--sheet)" stroke-width="2.4" fill="none" stroke-linecap="round" opacity=".8"/>
+    </svg>
+    <div class="head-text">
+      <h1>ガチャ見たよ帳</h1>
+      <p class="sub" id="whoami">見かけたガチャを書いておくと、友達みんなで見られます</p>
+    </div>
+  </header>
+
+  <p class="notice" id="demoNotice" hidden>
+    デモモードです。投稿はこの端末のブラウザにだけ保存されます。友達と共有するには <code>firebase-config.js</code> を設定してください（README参照）。
+  </p>
+
+  <!-- 初回：ニックネームと合言葉 -->
+  <section class="sheet" id="joinSheet" hidden>
+    <h2>はじめに</h2>
+    <form id="joinForm" novalidate>
+      <label for="jName">ニックネーム
+        <input type="text" id="jName" maxlength="20" placeholder="例：わかな" autocomplete="nickname">
+      </label>
+      <label for="jRoom">グループの合言葉
+        <input type="text" id="jRoom" maxlength="40" placeholder="友達と同じ言葉を入れると同じ帳面を見られます" autocomplete="off">
+      </label>
+      <p class="small">合言葉を知っている人だけが投稿を見られます。推測されにくい言葉にしてください。</p>
+      <div class="actions">
+        <button class="btn" type="submit">はじめる</button>
+        <span class="msg" id="jMsg" role="status"></span>
+      </div>
+    </form>
+  </section>
+
+  <div id="main" hidden>
+    <nav class="tabs" role="tablist" aria-label="表示の切り替え">
+      <button class="tab" type="button" role="tab" id="tabSee" aria-controls="paneSee" aria-selected="true">見かけた</button>
+      <button class="tab" type="button" role="tab" id="tabRel" aria-controls="paneRel" aria-selected="false">発売予定<span class="dot" id="relDot" hidden></span></button>
+    </nav>
+
+    <!-- ===== 見かけた ===== -->
+    <div id="paneSee" role="tabpanel" aria-labelledby="tabSee" class="pane">
+      <section class="sheet" id="postSheet">
+        <h2>見かけた！を書く</h2>
+        <form id="postForm" novalidate>
+          <label for="fSeries">シリーズ名
+            <input type="text" id="fSeries" maxlength="80" placeholder="例：〇〇のミニチュアフィギュア 第3弾" autocomplete="off" list="seriesList">
+            <datalist id="seriesList"></datalist>
+          </label>
+          <div class="row">
+            <label for="fShop">お店・設置場所
+              <input type="text" id="fShop" maxlength="80" placeholder="例：駅ビル3階のガチャコーナー" autocomplete="off" list="shopList">
+              <datalist id="shopList"></datalist>
+            </label>
+            <label for="fArea">エリア・駅
+              <input type="text" id="fArea" maxlength="40" placeholder="例：吉祥寺" autocomplete="off">
+            </label>
+          </div>
+          <fieldset>
+            <legend>状態</legend>
+            <label class="pick" style="--c:var(--mint);--w:var(--mint-wash)"><input type="radio" name="st" id="stNew" value="new" checked><span>入荷してた</span></label>
+            <label class="pick" style="--c:var(--peach);--w:var(--peach-wash)"><input type="radio" name="st" id="stLow" value="low"><span>残りわずか</span></label>
+            <label class="pick" style="--c:var(--stone);--w:var(--stone-wash)"><input type="radio" name="st" id="stOut" value="out"><span>売り切れ</span></label>
+          </fieldset>
+          <label for="fNote">メモ（任意）
+            <textarea id="fNote" maxlength="200" rows="2" placeholder="例：400円・2台並んでた・シークレットはまだ出てない"></textarea>
+          </label>
+          <div class="actions">
+            <button class="btn" type="submit" id="fSubmit">投稿する</button>
+            <span class="msg" id="fMsg" role="status"></span>
+          </div>
+        </form>
+      </section>
+
+      <section class="tools" aria-label="絞り込み">
+        <label for="q">さがす
+          <input type="text" id="q" placeholder="シリーズ名・お店・エリアで絞り込み" autocomplete="off">
+        </label>
+        <div class="chips" id="stFilter">
+          <button class="chip" type="button" data-f="all" aria-pressed="true">すべて</button>
+          <button class="chip" type="button" data-f="new" aria-pressed="false">入荷してた</button>
+          <button class="chip" type="button" data-f="low" aria-pressed="false">残りわずか</button>
+          <button class="chip" type="button" data-f="out" aria-pressed="false">売り切れ</button>
+          <button class="chip" type="button" data-f="want" aria-pressed="false">★ほしいものだけ</button>
+        </div>
+        <div class="want">
+          <span class="small">ほしいもの：</span>
+          <span id="wantTags" class="want"></span>
+          <input type="text" id="wantIn" placeholder="キーワードを追加" autocomplete="off" aria-label="ほしいものキーワード">
+        </div>
+        <p class="small">キーワードに一致する投稿と、発売予定で「ほしい」にしたシリーズの投稿には★がつきます。</p>
+      </section>
+
+      <p class="count" id="count"></p>
+      <ul id="feed" class="list" aria-live="polite"></ul>
+      <div class="sheet empty" id="empty">
+        <div class="big">まだ投稿がありません</div>
+        <p>ガチャを見かけたら、上のフォームから最初の1件を書いてみてください。</p>
+      </div>
+    </div>
+
+    <!-- ===== 発売予定 ===== -->
+    <div id="paneRel" role="tabpanel" aria-labelledby="tabRel" class="pane" hidden>
+      <section class="sheet">
+        <h2>発売予定を登録</h2>
+        <form id="relForm" novalidate>
+          <label for="rSeries">シリーズ名
+            <input type="text" id="rSeries" maxlength="80" placeholder="例：〇〇のミニチュアフィギュア 第3弾" autocomplete="off">
+          </label>
+          <div class="row">
+            <label for="rMonth">発売月
+              <input type="month" id="rMonth">
+            </label>
+            <label for="rWeek">時期
+              <select id="rWeek">
+                <option value="0">月内（週は未定）</option>
+                <option value="1">第1週より順次</option>
+                <option value="2">第2週より順次</option>
+                <option value="3">第3週より順次</option>
+                <option value="4">第4週より順次</option>
+                <option value="5">第5週より順次</option>
+              </select>
+            </label>
+          </div>
+          <div class="row">
+            <label for="rMaker">メーカー（任意）
+              <input type="text" id="rMaker" maxlength="30" placeholder="例：バンダイ" autocomplete="off" list="makerList">
+              <datalist id="makerList">
+                <option value="バンダイ"></option><option value="タカラトミーアーツ"></option>
+                <option value="ケンエレファント"></option><option value="エール"></option>
+                <option value="キタンクラブ"></option><option value="SO-TA"></option>
+              </datalist>
+            </label>
+            <label for="rPrice">価格（任意）
+              <input type="text" id="rPrice" maxlength="10" inputmode="numeric" placeholder="例：400">
+            </label>
+          </div>
+          <label for="rUrl">公式ページのURL（任意）
+            <input type="url" id="rUrl" maxlength="300" placeholder="https://" autocomplete="off">
+          </label>
+          <label class="check" for="rUndecided"><input type="checkbox" id="rUndecided"> 発売月はまだ未定</label>
+          <div class="actions">
+            <button class="btn" type="submit" id="rSubmit">登録する</button>
+            <span class="msg" id="rMsg" role="status"></span>
+          </div>
+          <p class="small">公式の発売スケジュールを見て、気になるものだけ登録する使い方がおすすめです。画像や説明文の転載はしないでください。</p>
+        </form>
+      </section>
+
+      <div class="chips" id="relFilter">
+        <button class="chip" type="button" data-f="all" aria-pressed="true">すべて</button>
+        <button class="chip" type="button" data-f="mine" aria-pressed="false">♡ ほしいだけ</button>
+        <button class="chip" type="button" data-f="past" aria-pressed="false">発売済みも表示</button>
+      </div>
+
+      <div id="relList"></div>
+      <div class="sheet empty" id="relEmpty">
+        <div class="big">発売予定はまだありません</div>
+        <p>気になる新作を見つけたら、上のフォームで登録してください。友達にも表示されます。</p>
+      </div>
+    </div>
+
+    <footer class="foot">
+      <button class="mini" type="button" id="inviteBtn">招待リンクをコピー</button>
+      <button class="mini" type="button" id="leaveBtn">ニックネーム・合言葉を変える</button>
+      <span class="msg" id="footMsg" role="status"></span>
+    </footer>
+  </div>
+</div>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>

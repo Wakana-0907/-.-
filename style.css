@@ -1,0 +1,160 @@
+/* ガチャ見たよ帳 — 1カラムのノート。手描き風の角丸とカプセル型のチップ */
+:root{
+  --paper:#fbf8f3;
+  --sheet:#ffffff;
+  --ink:#3a3532;
+  --ink-soft:#7a716b;
+  --line:#e7dfd5;
+  --mint:#8cc9b4; --mint-wash:#e3f3ec;
+  --peach:#f2a98a; --peach-wash:#fcebe2;
+  --stone:#b9b1aa; --stone-wash:#efebe7;
+  --sky:#93b7dc; --sky-wash:#e5eef8;
+  --star:#e8b44c;
+  --btn-ink:#3a3532;
+  --blob1:rgba(242,169,138,.18); --blob2:rgba(140,201,180,.18); --blob3:rgba(147,183,220,.16);
+  --f-hand:"Yomogi","Zen Maru Gothic",system-ui,sans-serif;
+  --f-body:"Zen Maru Gothic","Hiragino Maru Gothic ProN","Hiragino Sans","Noto Sans JP",system-ui,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root{
+  --paper:#23201e; --sheet:#2c2826; --ink:#efe8e1; --ink-soft:#ada399; --line:#433d38;
+  --mint:#7fbfa9; --mint-wash:#2b3a34; --peach:#e79e80; --peach-wash:#3d2e28;
+  --stone:#8f8780; --stone-wash:#35302d; --sky:#88acd2; --sky-wash:#2a3340; --star:#e2b04e;
+  --blob1:rgba(231,158,128,.10); --blob2:rgba(127,191,169,.09); --blob3:rgba(136,172,210,.08);
+  color-scheme:dark }}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:var(--f-body); font-size:15px; line-height:1.7;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  background-image:
+    radial-gradient(38rem 26rem at 8% -4%, var(--blob1), transparent 70%),
+    radial-gradient(30rem 22rem at 100% 18%, var(--blob2), transparent 70%),
+    radial-gradient(34rem 24rem at 30% 105%, var(--blob3), transparent 70%);
+  background-attachment:fixed;
+}
+[hidden]{display:none!important}
+.wrap{max-width:40rem; margin:0 auto; padding-inline:16px; padding-block:28px 64px; display:flex; flex-direction:column; gap:22px}
+#main{display:flex; flex-direction:column; gap:22px}
+
+header{display:flex; align-items:center; gap:14px}
+header svg{flex:none}
+.head-text{min-width:0}
+h1{font-family:var(--f-hand); font-weight:400; font-size:2rem; line-height:1.2; margin:0; text-wrap:balance}
+.sub{margin:0; color:var(--ink-soft); font-size:.88rem}
+
+.notice{margin:0; font-size:.85rem; background:var(--sky-wash); border-radius:14px 20px 12px 18px; padding:10px 14px}
+.notice code{font-size:.8rem}
+
+.sheet{
+  background:var(--sheet); border:1.5px solid var(--line);
+  border-radius:22px 30px 18px 34px / 28px 18px 30px 20px;
+  padding:18px 18px 20px;
+}
+.sheet h2{font-family:var(--f-hand); font-weight:400; font-size:1.25rem; margin:0 0 10px}
+
+form{display:grid; gap:12px}
+.row{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+@media (max-width:480px){.row{grid-template-columns:1fr}}
+label{display:grid; gap:4px; font-size:.82rem; color:var(--ink-soft); min-width:0}
+input[type=text],input[type=url],input[type=month],select,textarea{
+  font:inherit; font-size:16px; color:var(--ink); background:var(--paper);
+  border:1.5px solid var(--line); border-radius:12px 16px 12px 14px;
+  padding:8px 12px; width:100%;
+}
+textarea{resize:vertical; min-height:2.6rem}
+input:disabled,select:disabled{opacity:.5}
+.check{display:flex; align-items:center; gap:8px; font-size:.88rem; color:var(--ink)}
+.check input{width:18px; height:18px; accent-color:var(--peach)}
+
+/* タブ */
+.tabs{display:flex; gap:6px; border-bottom:1.5px solid var(--line)}
+.tab{
+  font:inherit; font-family:var(--f-hand); font-size:1.1rem; cursor:pointer; color:var(--ink-soft);
+  background:transparent; border:1.5px solid transparent; border-bottom:0; margin-bottom:-1.5px;
+  padding:6px 18px 4px; border-radius:16px 22px 0 0 / 14px 18px 0 0; position:relative;
+}
+.tab[aria-selected=true]{color:var(--ink); background:var(--sheet); border-color:var(--line)}
+.tab .dot{position:absolute; top:6px; right:6px; width:8px; height:8px; border-radius:50%; background:var(--star)}
+.pane{display:flex; flex-direction:column; gap:22px}
+
+/* 発売予定 */
+.relgroup{display:flex; flex-direction:column; gap:10px}
+#relList{display:flex; flex-direction:column; gap:22px}
+.grouphead{font-family:var(--f-hand); font-weight:400; font-size:1.15rem; margin:0; display:flex; align-items:center; gap:8px}
+.grouphead::after{content:""; flex:1; height:0; border-top:1.5px dashed var(--line)}
+.relgroup.now .grouphead{color:var(--peach)}
+.heart{color:var(--star)}
+.seen{margin:8px 0 0; font-size:.82rem; color:var(--ink-soft); overflow-wrap:anywhere}
+.mini.on{background:var(--peach-wash); border-color:var(--star)}
+a.mini{text-decoration:none; display:inline-block}
+input:focus-visible,textarea:focus-visible,button:focus-visible{outline:2px solid var(--sky); outline-offset:2px}
+
+fieldset{border:0; padding:0; margin:0; display:flex; flex-wrap:wrap; gap:8px}
+legend{font-size:.82rem; color:var(--ink-soft); margin-bottom:4px; padding:0}
+.pick{position:relative; display:inline-block}
+.pick input{position:absolute; opacity:0; pointer-events:none}
+.pick span{
+  display:inline-flex; align-items:center; gap:6px; cursor:pointer; color:var(--ink);
+  padding:5px 14px; border-radius:999px; border:1.5px solid var(--line);
+  font-size:.88rem; background:var(--paper);
+}
+.pick span::before{content:""; width:10px; height:10px; border-radius:50%; background:var(--c)}
+.pick input:checked + span{background:var(--w); border-color:var(--c)}
+.pick input:focus-visible + span{outline:2px solid var(--sky); outline-offset:2px}
+
+.actions{display:flex; align-items:center; gap:12px; flex-wrap:wrap}
+.btn{
+  font:inherit; font-weight:700; cursor:pointer; border:0; color:var(--btn-ink);
+  background:var(--peach); padding:9px 22px;
+  border-radius:20px 14px 22px 12px / 14px 20px 12px 22px;
+}
+.btn:hover{filter:brightness(1.05)}
+.btn[disabled]{opacity:.55; cursor:default}
+.msg{font-size:.85rem; color:var(--ink-soft)}
+.msg.err{color:var(--peach)}
+
+.tools{display:grid; gap:10px}
+.chips{display:flex; flex-wrap:wrap; gap:6px}
+.chip{
+  font:inherit; font-size:.82rem; cursor:pointer; color:var(--ink);
+  border:1.5px solid var(--line); background:transparent; padding:3px 12px; border-radius:999px;
+}
+.chip[aria-pressed=true]{background:var(--ink); color:var(--paper); border-color:var(--ink)}
+.want{display:flex; flex-wrap:wrap; gap:6px; align-items:center}
+.want .tag{display:inline-flex; align-items:center; gap:4px; background:var(--sky-wash); border-radius:999px; padding:2px 6px 2px 12px; font-size:.82rem}
+.want .tag button{font:inherit; border:0; background:transparent; color:var(--ink-soft); cursor:pointer; padding:0 6px; font-size:1rem; line-height:1}
+.want input{max-width:12rem; padding:4px 10px}
+.small{font-size:.78rem; color:var(--ink-soft); margin:0}
+
+.list{display:flex; flex-direction:column; gap:14px; list-style:none; margin:0; padding:0}
+.card{
+  position:relative; background:var(--sheet); border:1.5px solid var(--line);
+  border-radius:26px 18px 30px 16px / 18px 28px 16px 26px;
+  padding:14px 16px 12px 58px; min-width:0;
+}
+.card:nth-child(even){border-radius:18px 28px 16px 30px / 26px 16px 28px 18px}
+.card .cap{position:absolute; left:14px; top:16px}
+.card.old{opacity:.62}
+.card.hit{border-color:var(--star)}
+.card h3{margin:0; font-size:1.02rem; font-weight:700; overflow-wrap:anywhere}
+.where{margin:2px 0 0; font-size:.9rem; overflow-wrap:anywhere}
+.note{margin:6px 0 0; font-size:.88rem; color:var(--ink-soft); overflow-wrap:anywhere; white-space:pre-wrap}
+.meta{display:flex; flex-wrap:wrap; gap:4px 12px; margin-top:8px; font-size:.78rem; color:var(--ink-soft); align-items:center}
+.badge{display:inline-block; padding:1px 10px; border-radius:999px; font-size:.78rem; font-weight:700; background:var(--w); color:var(--ink); border:1.5px solid var(--c)}
+.star{color:var(--star); font-weight:700}
+.cardbtns{display:flex; flex-wrap:wrap; gap:6px; margin-top:8px}
+.mini{font:inherit; font-size:.78rem; cursor:pointer; color:var(--ink); background:var(--paper); border:1.5px solid var(--line); border-radius:10px 14px 10px 12px; padding:2px 10px}
+.mini:hover{border-color:var(--ink-soft)}
+.mini.danger{color:var(--peach)}
+
+.empty{text-align:center; padding:28px 18px; color:var(--ink-soft)}
+.empty p{margin:6px 0 0}
+.empty .big{font-family:var(--f-hand); font-size:1.2rem; color:var(--ink)}
+.count{font-size:.8rem; color:var(--ink-soft); margin:0}
+.foot{display:flex; flex-wrap:wrap; gap:8px; align-items:center; padding-top:8px; border-top:1.5px dashed var(--line)}
+
+@media (prefers-reduced-motion:no-preference){.card{animation:pop .35s ease-out both}}
+@keyframes pop{from{transform:translateY(4px)}to{transform:none}}

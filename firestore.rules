@@ -1,0 +1,50 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // 合言葉から作った部屋IDを知っている人だけが読める（部屋の一覧は誰にも取れない）
+    match /rooms/{room}/sightings/{id} {
+      allow read: if request.auth != null;
+
+      // 投稿：自分のIDで、必要な項目がそろっていること
+      allow create: if request.auth != null
+        && request.resource.data.by == request.auth.uid
+        && request.resource.data.series is string && request.resource.data.series.size() <= 80
+        && request.resource.data.shop is string && request.resource.data.shop.size() <= 80
+        && request.resource.data.status in ['new', 'low', 'out']
+        && (!('note' in request.resource.data) || request.resource.data.note.size() <= 200);
+
+      // 「まだあった／売り切れてた」：状態と確認情報だけ変更できる
+      allow update: if request.auth != null
+        && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['status', 'checkedAt', 'checkedBy', 'checkedByName'])
+        && request.resource.data.checkedBy == request.auth.uid
+        && request.resource.data.status in ['new', 'low', 'out'];
+
+      // 削除：投稿した本人だけ
+      allow delete: if request.auth != null && resource.data.by == request.auth.uid;
+    }
+
+    // 発売予定
+    match /rooms/{room}/releases/{id} {
+      allow read: if request.auth != null;
+
+      allow create: if request.auth != null
+        && request.resource.data.by == request.auth.uid
+        && request.resource.data.series is string && request.resource.data.series.size() <= 80
+        && request.resource.data.month is string && request.resource.data.month.size() <= 7
+        && request.resource.data.week is int && request.resource.data.week >= 0 && request.resource.data.week <= 5
+        && request.resource.data.url is string && request.resource.data.url.size() <= 300
+        && (request.resource.data.url == '' || request.resource.data.url.matches('^https?://.*'))
+        && request.resource.data.wants is map;
+
+      // 「ほしい」：自分のキーだけ足し引きできる
+      allow update: if request.auth != null
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['wants'])
+        && request.resource.data.wants.diff(resource.data.wants).affectedKeys().hasOnly([request.auth.uid]);
+
+      // 削除：登録した本人だけ
+      allow delete: if request.auth != null && resource.data.by == request.auth.uid;
+    }
+  }
+}
