@@ -505,7 +505,14 @@ drawWants();
     catch (e) {
       console.error(e);
       $("#demoNotice").hidden = false;
-      $("#demoNotice").textContent = "Firebaseにつながりませんでした（匿名ログインが有効か確認してください）。いまはデモモードで動いています。";
+      const code = e?.code || e?.message || String(e);
+      const hint =
+        /api-key-not-valid|invalid-api-key/.test(code) ? "firebase-config.js の apiKey が正しくありません。Firebaseコンソールからコピーし直してください。" :
+        /operation-not-allowed|admin-restricted/.test(code) ? "匿名ログインが有効になっていません。Authentication →「ログイン方法」で「匿名」を有効にしてください。" :
+        /unauthorized-domain/.test(code) ? "このURLがFirebaseで許可されていません。Authentication →「設定」→「承認済みドメイン」に追加してください。" :
+        /network|Failed to fetch|import/.test(code) ? "インターネットにつながらないか、Firebaseの読み込みに失敗しました。" :
+        "Firebaseにつながりませんでした。";
+      $("#demoNotice").textContent = `${hint}いまはデモモードで動いています。（エラー：${code}）`;
       store = demoStore();
     }
   } else {
